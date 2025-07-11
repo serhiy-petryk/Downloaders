@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -11,6 +12,7 @@ namespace UAKino.Helpers
     {
         public static void ParseUAKinoFilmyAction(Action<string> showStatusAction)
         {
+            var genres = new Dictionary<string, int>();
             var fileNames = Directory.GetFiles(@"D:\Temp\film\uakino-filmy", "*.html");
             var count = 0;
             Debug.Print("Plus\tZero\tMinus\tQuality\tName\tIMDB\tGenre\tYear\tActors\tDescription");
@@ -49,6 +51,7 @@ namespace UAKino.Helpers
 
                     i1 = s.IndexOf(">Жанр:<", i1, StringComparison.InvariantCulture);
                     var genre = NormalizeGenre(GetDivValue(s, i1));
+                    UpdateGenres(genre);
 
                     i1 = s.IndexOf(">Рік виходу:<", i1, StringComparison.InvariantCulture);
                     var year = GetYear(s, i1);
@@ -64,7 +67,22 @@ namespace UAKino.Helpers
                 }
             }
 
+            Debug.Print("/nGenres");
+            foreach(var kvp in genres)
+                Debug.Print($"{kvp.Key}\t{kvp.Value}");
+
             MessageBox.Show("See results in debug window");
+
+            void UpdateGenres(string genre)
+            {
+                var ss = genre.Split(',', StringSplitOptions.None);
+                foreach (var s in ss)
+                {
+                    var key = s.Trim();
+                    if (!genres.ContainsKey(key)) genres.Add(key, 0);
+                    genres[key]++;
+                } 
+            }
         }
 
         private static string GetValue(string content, int offset)
