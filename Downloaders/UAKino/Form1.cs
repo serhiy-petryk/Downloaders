@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UAKino.Helpers;
 
 namespace UAKino
 {
@@ -14,32 +13,15 @@ namespace UAKino
         }
 
         private async void btnDownloadUAKinoFilmy_Click(object sender, EventArgs e) =>
-            RunAction((Button)sender, DownloadUAKinoFilmyAction);
+            RunAction((Button)sender, CefSharpDownloader.DownloadUAKinoFilmyAction);
 
-        private async void DownloadUAKinoFilmyAction()
-        {
-            var urlsAndFiles = new List<(string, string)>();
-            for (var k = 0; k < 369; k++)
-            {
-                urlsAndFiles.Add(($"https://uakino.best/filmy/page/{k + 1}/",
-                    Path.Combine(@"D:\Temp\film\uakino-filmy", "uakino-filmy" + (k + 1).ToString("D5") + ".html")));
-            }
+        private void btnParseUAKinoFilmy_Click(object sender, EventArgs e) =>
+            RunAction((Button)sender, Parsers.ParseUAKinoFilmyAction);
 
-            if (DialogResult.Yes ==
-                MessageBox.Show($@"!!! Before run application run vpn (Psiphon3 - Poland) !!! Continue?", null,
-                    MessageBoxButtons.YesNo))
-                await Helpers.CefSharpDownloader.DownloadPagesAsync(urlsAndFiles, ShowStatus);
-        }
-
-        private void btnParseUAKinoFilmy_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private async void RunAction(Control button, Action action)
+        private async void RunAction(Control button, Action<Action<string>> action)
         {
             button.Enabled = false;
-            await Task.Factory.StartNew(action);
+            await Task.Factory.StartNew(() => action(ShowStatus));
             button.Enabled = true;
         }
 
