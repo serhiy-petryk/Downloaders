@@ -13,16 +13,10 @@ namespace UAKino
             InitializeComponent();
         }
 
-        private async void btnDownloadUAKinoFilmy_Click(object sender, EventArgs e)
-        {
-            btnDownloadUAKinoFilmy.Enabled = false;
+        private async void btnDownloadUAKinoFilmy_Click(object sender, EventArgs e) =>
+            RunAction((Button)sender, DownloadUAKinoFilmyAction);
 
-            await Task.Factory.StartNew(DownloadUAKinoFilmyAction);
-
-            btnDownloadUAKinoFilmy.Enabled = true;
-        }
-
-        private static async void DownloadUAKinoFilmyAction()
+        private async void DownloadUAKinoFilmyAction()
         {
             var urlsAndFiles = new List<(string, string)>();
             for (var k = 0; k < 369; k++)
@@ -34,7 +28,27 @@ namespace UAKino
             if (DialogResult.Yes ==
                 MessageBox.Show($@"!!! Before run application run vpn (Psiphon3 - Poland) !!! Continue?", null,
                     MessageBoxButtons.YesNo))
-                await Helpers.CefSharpDownloader.DownloadPagesAsync(urlsAndFiles);
+                await Helpers.CefSharpDownloader.DownloadPagesAsync(urlsAndFiles, ShowStatus);
+        }
+
+        private void btnParseUAKinoFilmy_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private async void RunAction(Control button, Action action)
+        {
+            button.Enabled = false;
+            await Task.Factory.StartNew(action);
+            button.Enabled = true;
+        }
+
+        private void ShowStatus(string message)
+        {
+            if (statusStrip1.InvokeRequired)
+                Invoke(new MethodInvoker(delegate { ShowStatus(message); }));
+            else
+                statusLabel.Text = message;
         }
     }
 }
