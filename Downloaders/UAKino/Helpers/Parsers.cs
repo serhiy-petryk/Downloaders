@@ -67,8 +67,8 @@ namespace UAKino.Helpers
                 }
             }
 
-            Debug.Print("/nGenres");
-            foreach(var kvp in genres)
+            Debug.Print("\nGenre\tCount");
+            foreach (var kvp in genres)
                 Debug.Print($"{kvp.Key}\t{kvp.Value}");
 
             MessageBox.Show("See results in debug window");
@@ -134,6 +134,11 @@ namespace UAKino.Helpers
 
         private static string NormalizeGenre(string oldGenres)
         {
+            oldGenres = oldGenres.Replace("Дорами", "Драми").Replace("Драма", "Драми")
+                .Replace("Кримінальні", "Кримінал").Replace("Субтитровані фільми", "Субтитровані")
+                .Replace("Субтитровані серіали", "Субтитровані").Replace(", Пуститися берега", "")
+                .Replace(", Сімпсони", "");
+
             var ss = oldGenres.Split(',', StringSplitOptions.RemoveEmptyEntries);
             return string.Join(", ",
                 ss.Where(a => !a.TrimStart().StartsWith("20") && !a.TrimStart().StartsWith("19"))
