@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace UAKino.Helpers
@@ -47,7 +48,7 @@ namespace UAKino.Helpers
                         : decimal.Parse(sImdb, CultureInfo.InvariantCulture);
 
                     i1 = s.IndexOf(">Жанр:<", i1, StringComparison.InvariantCulture);
-                    var genre = GetDivValue(s, i1).Replace(" , ", ", ");
+                    var genre = NormalizeGenre(GetDivValue(s, i1));
 
                     i1 = s.IndexOf(">Рік виходу:<", i1, StringComparison.InvariantCulture);
                     var year = GetYear(s, i1);
@@ -111,6 +112,14 @@ namespace UAKino.Helpers
                 actors[k] = ss[k].Substring(i1 + 1).Trim();
             }
             return string.Join(", ", actors);
+        }
+
+        private static string NormalizeGenre(string oldGenres)
+        {
+            var ss = oldGenres.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            return string.Join(", ",
+                ss.Where(a => !a.TrimStart().StartsWith("20") && !a.TrimStart().StartsWith("19"))
+                    .Select(a => a.Trim()));
         }
     }
 }
